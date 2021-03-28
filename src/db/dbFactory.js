@@ -9,7 +9,7 @@ export default class DBFactory{
         this.connection = mysql.createPool({
             host: 'localhost',
             user: 'root',
-            password: '18901347a',
+            password: '',
             database: 'classroom'
 
         });
