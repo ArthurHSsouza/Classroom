@@ -2,6 +2,10 @@ import {promisify} from 'util';
 import bcrypt from 'bcrypt';
 import UserDAO from '../db/dao/userDAO.js';
 import Exception from '../exceptions/user.js';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+
 
 export default class UserModel {
 
@@ -13,6 +17,7 @@ export default class UserModel {
         this.#hash = promisify(bcrypt.hash);
         this.#compare = promisify(bcrypt.compare);
         this.#salt = promisify(bcrypt.genSalt);
+        dotenv.config();
 
     }
 
@@ -62,15 +67,28 @@ export default class UserModel {
    login = async (user) => {
 
         try{
+           
             this.#validateUser(user, null);
-            let userFound = await this.#userDAO.getUserByEmail(user.email);
-            if(userFound.length == 0)
+            let [userFound] = await this.#userDAO.getUserByEmail(user.email);
+            if(!userFound)
                 throw Exception.userValidationException("E-mail incorreto");
   
-            if(!this.#compare( userFound[0].password, user.password))
+            if(!this.#compare( userFound.password, user.password))
                 throw Exception.userValidationException("Senha incorreta");
+
+            let token = jwt.sign({
+                name: userFound.username,
+                email: userFound.email
+            }, process.env.SECRET,
+                {
+                    expiresIn: "7d"
+                }
+            );
+
+            return token;
             
         }catch(Exception){
+            console.log(Exception);
             throw Exception;
         }
     }

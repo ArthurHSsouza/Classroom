@@ -34,9 +34,9 @@ import UserModel from '../models/UserModel.js';
             
             let {email, password} = req.body;
             let user = {email, password};
-            await this.#model.login(user);
+            let token = await this.#model.login(user);
             res.statusCode = 200;
-            res.json({message: "login OK"});
+            res.json({message: "Usuário autenticado com sucesso", token});
 
         }catch(Exception){
 
