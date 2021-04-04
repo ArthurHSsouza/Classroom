@@ -1,11 +1,11 @@
 import {promisify} from 'util';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import UserDAO from '../db/dao/userDAO.js';
 import Exception from '../exceptions/user.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-
-
+import emailSender from '../services/emailSender.js';
 
 export default class UserModel {
 
@@ -54,13 +54,24 @@ export default class UserModel {
             
             let salt = await this.#salt(10);
             user.password = await this.#hash(user.password, salt);
-            await this.#userDAO.createUser(user);
+            let validationHash = crypto.randomBytes(20).toString('hex');
+            let id = await this.#userDAO.createUser(user, validationHash);
+            
+            await emailSender(user.email, "Welcome!",
+            `<h1>Welcome to Classroom!</h1>
+                </br>
+                </br>
+                <p>We're glad to welcome you, ${user.name}, to our platform.
+                   To access your profile, you just need to authenticate your account 
+                   by clicking on the link below:
+                </p>
+                <a href="localhost:8080/validateAccount/${id}/${validationHash}">
+                <button><h4>Authenticate account</h4></button></a>
+            `);
 
-        }catch(exception){
-
-            console.log(exception);
-            throw(exception);
-
+        }catch(Exception){
+            console.log(Exception);
+            throw(Exception);
         }
     }
 
@@ -90,6 +101,16 @@ export default class UserModel {
         }catch(Exception){
             console.log(Exception);
             throw Exception;
+        }
+    }
+
+    validateAccount = async (userId, code) => {
+
+        let user = await this.#userDAO.getUserByIdAndAuth(userId, code);
+        if(user){
+            return;
+        }else{
+            throw Exception.userNotFoundException("Usuário não encontrado");
         }
     }
 }
