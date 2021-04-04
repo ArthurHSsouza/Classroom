@@ -35,8 +35,7 @@ import UserModel from '../models/UserModel.js';
             let {email, password} = req.body;
             let user = {email, password};
             let token = await this.#model.login(user);
-            res.statusCode = 200;
-            res.json({message: "Usuário autenticado com sucesso", token});
+            res.status(200).json({message: "Usuário autenticado com sucesso", token});
 
         }catch(Exception){
 
@@ -44,6 +43,20 @@ import UserModel from '../models/UserModel.js';
             res.json({message: Exception.treated ? Exception.message : "Erro interno do servidor"});
 
         }
+    }
+
+    validateAccount = async (req, res) => {
+        
+            try{
+
+                let {userId, code} = req.params;
+                await this.#model.validateAccount(userId, code);
+                res.status(200).send("Sua conta foi validada!");
+                
+            }catch(Exception){
+
+            }
+
     }
 
  }

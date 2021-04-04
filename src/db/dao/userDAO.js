@@ -6,15 +6,16 @@ export default class UserDAO{
         this.conn = new DBFactory().getConnection();
     }
 
-    createUser = async (user) => {
+    createUser = async (user, validationHash) => {
 
         let {name, email, password} = user;
         
         try{
 
-            let query = `INSERT INTO users(username, email, password)
-            VALUES("${name}","${email}","${password}")`;
-            (await this.conn).query(query);
+            let query = `INSERT INTO users(username, email, password, validateAccount)
+            VALUES("${name}","${email}","${password}", "${validationHash}")`;
+            let [data] = await this.conn.execute(query);
+            return data.insertId;
         
         }catch(exception){
 
@@ -28,7 +29,7 @@ export default class UserDAO{
 
             try{
                 
-                let query = `SELECT * FROM users WHERE email = "${email}"`;
+                let query = `SELECT * FROM users WHERE email = "${email} AND validated = 1"`;
                 let [rows] = await this.conn.execute(query);
                 return rows;
 
@@ -39,7 +40,19 @@ export default class UserDAO{
             }
     }
 
-    
+    getUserByIdAndAuth = async (userId, code) => {
+
+            try{
+
+                let query = `UPDATE * FROM users SET validated = 1 WHERE id = ${userId} AND validateAccount = ${code}`;
+                let [data] = await this.conn.execute(query);
+                return data;
+
+            }catch(Exception){
+                throw Exception;
+            }
+
+    }
 
     /*update = async(user) => {
     }*/
