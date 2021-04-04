@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 
-
 export default (req, res, next) => {
     
     let token = req.headers['authorization']

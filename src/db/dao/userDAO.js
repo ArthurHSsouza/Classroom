@@ -17,21 +17,29 @@ export default class UserDAO{
             let [data] = await this.conn.execute(query);
             return data.insertId;
         
-        }catch(exception){
+        }catch(Exception){
 
-            console.log(exception);
-            throw(exception);
+            console.log(Exception);
+            throw(Exception);
 
         }
     }
 
-    getUserByEmail = async (email) => {
+    getUser = async (email, id) => {
 
             try{
-                
-                let query = `SELECT * FROM users WHERE email = "${email} AND validated = 1"`;
-                let [rows] = await this.conn.execute(query);
-                return rows;
+                if(email){
+                   
+                    let query = `SELECT * FROM users WHERE email = "${email}" AND validated = 1`;
+                    let [rows] = await this.conn.execute(query);
+                    return rows;
+
+                }else if(id){
+                   
+                    let query = `SELECT * FROM users WHERE id = "${id}" AND validated = 1`;
+                    let [rows] = await this.conn.execute(query);
+                    return rows;
+                }
 
             }catch(Exception){
                 
@@ -44,11 +52,15 @@ export default class UserDAO{
 
             try{
 
-                let query = `UPDATE * FROM users SET validated = 1 WHERE id = ${userId} AND validateAccount = ${code}`;
+                let query = `UPDATE users SET validated = 1 WHERE id = "${userId}" 
+                AND validateAccount = "${code}" 
+                AND validated = 0;`;
+
                 let [data] = await this.conn.execute(query);
-                return data;
+                return data.affectedRows;
 
             }catch(Exception){
+                console.log(Exception);
                 throw Exception;
             }
 

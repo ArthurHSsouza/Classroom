@@ -1,15 +1,15 @@
-export default class UserException
-{
-      static userValidationException(message){
+export default {
+      
+      userValidationException: (message)=>{
                 
             return{
                     message: message,
                     treated:true,
                     statusCode: 400
                 }
-        }
+        },
 
-      static userNotFoundException(){
+      userNotFoundException: ()=>{
       
             return{ 
                     message: "Usuário não encontrado",

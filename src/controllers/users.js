@@ -18,7 +18,7 @@ import UserModel from '../models/UserModel.js';
             let user = {email, password, rPassword, name};
             await this.#model.signin(user);
             res.statusCode = 200;
-            res.json({message: "Usuário salvo com sucesso"});
+            res.json({message: "Enviamos um e-mail de confirmação para o endereço informado, acesse o link fornecido para liberar a conta"});
 
         }catch(Exception){
    
@@ -47,16 +47,18 @@ import UserModel from '../models/UserModel.js';
 
     validateAccount = async (req, res) => {
         
-            try{
-
-                let {userId, code} = req.params;
-                await this.#model.validateAccount(userId, code);
-                res.status(200).send("Sua conta foi validada!");
+        try{
                 
-            }catch(Exception){
+            let {userId, code} = req.params;
+            let token = await this.#model.validateAccount(userId, code);
+            res.status(200).json({message: "Sua conta foi validada!", token});
 
-            }
+        }catch(Exception){
+                 
+            res.statusCode = Exception.statusCode || 500;
+            res.json({message: Exception.treated ? Exception.message : "Erro interno do servidor"});
 
+        }
     }
-
- }
+    
+}
