@@ -38,10 +38,8 @@ import UserModel from '../models/UserModel.js';
             res.status(200).json({message: "Usuário autenticado com sucesso", token});
 
         }catch(Exception){
-
             res.statusCode = Exception.statusCode || 500;
             res.json({message: Exception.treated ? Exception.message : "Erro interno do servidor"});
-
         }
     }
 
@@ -53,11 +51,59 @@ import UserModel from '../models/UserModel.js';
             let token = await this.#model.validateAccount(userId, code);
             res.status(200).json({message: "Sua conta foi validada!", token});
 
-        }catch(Exception){
-                 
+        }catch(Exception){  
             res.statusCode = Exception.statusCode || 500;
             res.json({message: Exception.treated ? Exception.message : "Erro interno do servidor"});
-
         }
+    }
+
+    setRecoverCod =  async (req, res) => {
+
+          let {email} = req.params;
+          try{
+
+            await this.#model.setRecoverToken(email); 
+            res.status(200).json({
+                message: "E-mail enviado com sucesso, verifique sua caixa de mensagens",
+                email
+            });
+
+        }catch(Exception){
+            res.statusCode = Exception.statusCode || 500;
+            res.json({message: Exception.treated ? Exception.message : "Erro interno do servidor"});
+        }
+    }
+
+    validateRecoverToken = async(req, res) => {
+
+        let {token, email} = req.params;
+        try{
+
+            let permissionToken = await this.#model.validateRecoverToken(token, email);
+            res.status(200).json({token: permissionToken});
+
+        }catch(Exception){
+            
+            res.statusCode = Exception.statusCode || 500;
+            res.json({message: Exception.treated ? Exception.message : "Erro interno do servidor"});
+        }
+
+    }
+
+    resetPassword = async(req, res) => {
+       
+        try{
+
+            let {password, rePassword} = req.body;
+            let token = req.headers['authorization'];
+            await this.#model.resetPassword(password, rePassword, token);
+            res.status(200).json({message: "Senha alterada com sucesso"});
+
+        }catch(Exception){
+            
+            res.statusCode = Exception.statusCode || 500;
+            res.json({message: Exception.treated ? Exception.message : "Erro interno do servidor"});
+        }
+
     }
 }

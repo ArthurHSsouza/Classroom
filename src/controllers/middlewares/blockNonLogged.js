@@ -7,10 +7,14 @@ export default (req, res, next) => {
         res.status(401).json({message: "Token inválido"});
     }
 
-    let decoded = jwt.verify(token.split(' ')[1], process.env.SECRET);
+    let decoded = jwt.verify(token.split(' ')[1], 
+    process.env.SECRET);
+
     if(decoded){
+
         next();
         return;
+
     }
     res.status(401).json({message: "Token inválido"});
     
