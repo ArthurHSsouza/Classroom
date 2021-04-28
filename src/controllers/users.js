@@ -1,5 +1,5 @@
 import UserModel from '../models/UserModel.js';
-
+import handler from '../exceptions/handler.js';
 
  export default class UserController{
 
@@ -21,9 +21,9 @@ import UserModel from '../models/UserModel.js';
             res.json({message: "Enviamos um e-mail de confirmação para o endereço informado, acesse o link fornecido para liberar a conta"});
 
         }catch(Exception){
-   
-            res.statusCode = Exception.statusCode || 500;
-            res.json({message: Exception.treated ? Exception.message : "Erro interno do servidor"});
+             
+            handler(Exception, res);
+            
         }
         
     }
@@ -38,10 +38,9 @@ import UserModel from '../models/UserModel.js';
             res.status(200).json({message: "Usuário autenticado com sucesso", token});
 
         }catch(Exception){
-
-            res.statusCode = Exception.statusCode || 500;
-            res.json({message: Exception.treated ? Exception.message : "Erro interno do servidor"});
-
+            
+            handler(Exception, res);
+           
         }
     }
 
@@ -53,11 +52,60 @@ import UserModel from '../models/UserModel.js';
             let token = await this.#model.validateAccount(userId, code);
             res.status(200).json({message: "Sua conta foi validada!", token});
 
-        }catch(Exception){
-                 
-            res.statusCode = Exception.statusCode || 500;
-            res.json({message: Exception.treated ? Exception.message : "Erro interno do servidor"});
+        }catch(Exception){  
+            
+            handler(Exception, res);
 
+        }
+    }
+
+    setRecoverCod =  async (req, res) => {
+
+          let {email} = req.params;
+          try{
+
+            await this.#model.setRecoverToken(email); 
+            res.status(200).json({
+                message: "E-mail enviado com sucesso, verifique sua caixa de mensagens",
+                email
+            });
+
+        }catch(Exception){
+           
+            handler(Exception, res);
+            
+        }
+    }
+
+    validateRecoverToken = async(req, res) => {
+
+        let {token, email} = req.params;
+        try{
+
+            let permissionToken = await this.#model.validateRecoverToken(token, email);
+            res.status(200).json({token: permissionToken});
+
+        }catch(Exception){
+            
+            handler(Exception, res);
+           
+        }
+
+    }
+
+    resetPassword = async(req, res) => {
+       
+        try{
+
+            let {password, rePassword} = req.body;
+            let token = req.headers['authorization'];
+            await this.#model.resetPassword(password, rePassword, token);
+            res.status(200).json({message: "Senha alterada com sucesso"});
+
+        }catch(Exception){
+           
+            handler(Exception, res);
+        
         }
     }
 }
