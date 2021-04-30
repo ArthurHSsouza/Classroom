@@ -6,6 +6,7 @@ import exceptionHandler from '../exceptions/userExc.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import emailSender from '../services/emailSender.js';
+import { Console } from 'console';
 
 export default class UserModel {
 
@@ -171,6 +172,7 @@ export default class UserModel {
             process.env.RECOVERY_TOKEN_SECRET);
         
         }catch(Exception){
+
 
             throw exceptionHandler.notAuthorized("Token inválido"); 
 

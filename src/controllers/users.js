@@ -40,7 +40,6 @@ import handler from '../exceptions/handler.js';
         }catch(Exception){
             
             handler(Exception, res);
-           
         }
     }
 
@@ -55,7 +54,7 @@ import handler from '../exceptions/handler.js';
         }catch(Exception){  
             
             handler(Exception, res);
-
+          
         }
     }
 
@@ -69,6 +68,7 @@ import handler from '../exceptions/handler.js';
                 message: "E-mail enviado com sucesso, verifique sua caixa de mensagens",
                 email
             });
+
 
         }catch(Exception){
            
@@ -91,6 +91,26 @@ import handler from '../exceptions/handler.js';
            
         }
 
+        }catch(Exception){
+            res.statusCode = Exception.statusCode || 500;
+            res.json({message: Exception.treated ? Exception.message : "Erro interno do servidor"});
+        }
+    }
+
+    validateRecoverToken = async(req, res) => {
+
+        let {token, email} = req.params;
+        try{
+
+            let permissionToken = await this.#model.validateRecoverToken(token, email);
+            res.status(200).json({token: permissionToken});
+
+        }catch(Exception){
+            
+            res.statusCode = Exception.statusCode || 500;
+            res.json({message: Exception.treated ? Exception.message : "Erro interno do servidor"});
+        }
+
     }
 
     resetPassword = async(req, res) => {
@@ -103,9 +123,11 @@ import handler from '../exceptions/handler.js';
             res.status(200).json({message: "Senha alterada com sucesso"});
 
         }catch(Exception){
+
            
             handler(Exception, res);
-        
+       
         }
+
     }
 }

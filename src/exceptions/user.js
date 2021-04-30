@@ -16,5 +16,14 @@ export default {
                     treated:true,
                     statusCode: 404 
                 }
+      },
+
+      notAuthorized: (message)=>{
+      
+            return{ 
+                    message,
+                    treated: true,
+                    statusCode: 401 
+                }
       }
 }
