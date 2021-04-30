@@ -2,7 +2,7 @@ import {promisify} from 'util';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import UserDAO from '../db/dao/userDAO.js';
-import exceptionHandler from '../exceptions/user.js';
+import exceptionHandler from '../exceptions/userExc.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import emailSender from '../services/emailSender.js';
@@ -128,14 +128,16 @@ export default class UserModel {
             
             let recoverToken = crypto.randomBytes(20).toString('hex');
             let expires = Date.now() + 1000 * 60 * 60;
-            await this.#userDAO.setResetPasswordToken(email, recoverToken, expires);
-            emailSender(email, "Change password",
-            `<h1>Change password</h1>
-            </br>
-            <p>
-             Use the following code to change your passoword: <b>${recoverToken}</b>
-            </p>
-        `);
+            let rows = await this.#userDAO.setResetPasswordToken(email, recoverToken, expires);
+            if(rows){
+                emailSender(email, "Change password",
+                `<h1>Change password</h1>
+                </br>
+                <p>
+                Use the following code to change your passoword: <b>${recoverToken}</b>
+                </p>
+            `);
+            }
             
         }else{
           throw exceptionHandler.userNotFoundException();
@@ -170,6 +172,7 @@ export default class UserModel {
             process.env.RECOVERY_TOKEN_SECRET);
         
         }catch(Exception){
+
 
             throw exceptionHandler.notAuthorized("Token inválido"); 
 
