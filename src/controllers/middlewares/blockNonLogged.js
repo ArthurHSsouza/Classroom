@@ -3,19 +3,22 @@ import jwt from 'jsonwebtoken';
 export default (req, res, next) => {
     
     let token = req.headers['authorization']
+    
     if(!token){
         res.status(401).json({message: "Token inválido"});
     }
 
-    let decoded = jwt.verify(token.split(' ')[1], 
-    process.env.SECRET);
+    try{
+        let userId = jwt.verify(token.split(' ')[1], process.env.SECRET)
+        if(userId){
 
-    if(decoded){
+            next();
+            return;
 
-        next();
-        return;
+        }
+    }catch(Exception){
+
+        res.status(401).json({message: "Token inválido"});
 
     }
-    res.status(401).json({message: "Token inválido"});
-    
 }
