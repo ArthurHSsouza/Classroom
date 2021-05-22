@@ -90,11 +90,6 @@ import handler from '../exceptions/handler.js';
             handler(Exception, res);
            
         }
-
-        }catch(Exception){
-            res.statusCode = Exception.statusCode || 500;
-            res.json({message: Exception.treated ? Exception.message : "Erro interno do servidor"});
-        }
     }
 
     validateRecoverToken = async(req, res) => {
@@ -107,8 +102,7 @@ import handler from '../exceptions/handler.js';
 
         }catch(Exception){
             
-            res.statusCode = Exception.statusCode || 500;
-            res.json({message: Exception.treated ? Exception.message : "Erro interno do servidor"});
+            handler(Exception, res);
         }
 
     }

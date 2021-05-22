@@ -88,6 +88,7 @@ export default class UserModel {
             throw exceptionHandler.userValidationException("Senha incorreta");
 
         let token = jwt.sign({
+            userId: userFound.id,
             name: userFound.username,
             email: userFound.email
         }, process.env.SECRET,
