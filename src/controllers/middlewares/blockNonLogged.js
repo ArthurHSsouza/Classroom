@@ -9,9 +9,10 @@ export default (req, res, next) => {
     }
 
     try{
-        let userId = jwt.verify(token.split(' ')[1], process.env.SECRET)
+        let {userId} = jwt.verify(token.split(' ')[1], process.env.SECRET)
         if(userId){
 
+            req.params.userId = userId;
             next();
             return;
 

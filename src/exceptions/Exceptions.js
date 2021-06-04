@@ -1,6 +1,6 @@
 export default {
       
-      userValidationException: (message)=>{
+      validationException: (message)=>{
                 
             return{
                     message: message,
@@ -22,6 +22,15 @@ export default {
       
             return{ 
                     message,
+                    treated: true,
+                    statusCode: 401 
+                }
+      },
+
+     ErrorSendingEmailException: (email)=>{
+      
+            return{ 
+                    message: `Erro ao tentar enviar e-mail para o endereço ${email}`,
                     treated: true,
                     statusCode: 401 
                 }
